@@ -124,15 +124,15 @@ class NeuralNetwork
     {
         // First, sanity checks.
         if ($networka->getOutputCount() !== $networkb->getInputCount()) {
-            throw new \InvalidArgumentException("Number of output nodes on network A must equal number of input nodes on network b!");
+            throw new \InvalidArgumentException('Number of output nodes on network A must equal number of input nodes on network b!');
         }
 
         if ($networka->type !== $networkb->type) {
-            throw new \InvalidArgumentException("Type of network A must equal type of network b!");
+            throw new \InvalidArgumentException('Type of network A must equal type of network b!');
         }
 
         if ($networka->version !== $networkb->version) {
-            throw new \InvalidArgumentException("Version of network A must equal version of network b!");
+            throw new \InvalidArgumentException('Version of network A must equal version of network b!');
         }
 
         // Good! Create a new net.
