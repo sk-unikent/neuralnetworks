@@ -28,6 +28,22 @@ class NeuralNetwork
     }
 
     /**
+     * Get a type.
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * Get a version.
+     */
+    public function getVersion()
+    {
+        return $this->version;
+    }
+
+    /**
      * Get a description.
      */
     public function getDescription()
@@ -61,11 +77,31 @@ class NeuralNetwork
      * Loads a neural network from a file saved by the 'save()' function. Clears
      * the training and control data added so far.
      *
+     * @param array $data The data to load the network from
+     *
+     * @return bool 'true' on success, 'false' otherwise
+     */
+    public static function load($data)
+    {
+        $class = '\\KeltyNN\\Networks\\' . $data['type'];
+
+        $obj = new $class($data['nodeCount']);
+        if ($obj->restore($data)) {
+            return $obj;
+        }
+
+        return false;
+    }
+
+    /**
+     * Loads a neural network from a file saved by the 'save()' function. Clears
+     * the training and control data added so far.
+     *
      * @param string $filename The filename to load the network from
      *
      * @return bool 'true' on success, 'false' otherwise
      */
-    public static function load($filename)
+    public static function loadfile($filename)
     {
         if (!file_exists($filename)) {
             return false;
@@ -77,14 +113,7 @@ class NeuralNetwork
             return false;
         }
 
-        $class = '\\KeltyNN\\Networks\\' . $data['type'];
-
-        $obj = new $class($data['nodeCount']);
-        if ($obj->restore($data)) {
-            return $obj;
-        }
-
-        return false;
+        return self::load($data);
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace KeltyNN\Serializers;
+namespace KeltyNN\Input;
 
 class Image
 {

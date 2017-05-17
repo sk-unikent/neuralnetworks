@@ -5,7 +5,7 @@
 require_once(dirname(__FILE__) . '/../lib.php');
 
 // Create a Perceptron network.
-$eq = KeltyNN\NeuralNetwork::load(dirname(__FILE__) . '/../trained/maths/advanced/equals.nn');
+$eq = KeltyNN\NeuralNetwork::loadfile(dirname(__FILE__) . '/../trained/maths/advanced/equals.nn');
 
 // Add test-data to the network.
 $testdata = array();

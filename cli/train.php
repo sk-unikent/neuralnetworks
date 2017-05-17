@@ -5,17 +5,18 @@
 require_once(dirname(__FILE__) . '/../lib.php');
 
 $input = 2;
-$output = 1;
+$output = 4;
 
 $done = array();
-for ($i = 1; $i <= 12; $i++) {
-    $layer1 = $i; //rand(1, 6);
-    $layer2 = 0; //rand(0, 6);
-    $layer3 = 0; //rand(0, 6);
-    $k = "{$layer1}{$layer2}{$layer3}";
-    if (isset($done[$k])) {
-        continue;
-    }
+for ($i = 4; $i <= 12; $i++) {
+    $time = microtime(True);
+
+    do {
+        $layer1 = $i;
+        $layer2 = 0;// rand(0, 40);
+        $layer3 = 0;//rand(0, 40);
+        $k = "{$layer1}{$layer2}{$layer3}";
+    } while (isset($done[$k]));
     $done[$k] = true;
 
     // Create a Perceptron network.
@@ -24,33 +25,44 @@ for ($i = 1; $i <= 12; $i++) {
     } elseif ($layer2) {
         $n = new KeltyNN\Networks\FFMLPerceptron($input, $layer1, $layer2, $output);
     } else {
-        $n = new KeltyNN\Networks\FFMLPerceptron($input, $layer1, $output);
+        $n = new KeltyNN\Networks\FFMLFlexPerceptron($input, $layer1, $output);
     }
-    $n->setTitle('AND logic gate');
-    $n->setDescription('Given two inputs, this will output 1 if both are 1 and -1 if both, or either, are 0.');
+    $n->setTitle('Snake Move Model');
+    $n->setDescription('Given the current direction and deltas between the snake and the apple, decide which direction to move.');
     $n->setVerbose(false);
 
     // Add test-data to the network.
-    $n->addTestData(array(1, 1), array(1));
-    $n->addTestData(array(0, 1), array(-1));
-    $n->addTestData(array(1, 0), array(-1));
-    $n->addTestData(array(0, 0), array(-1));
+    // x, y in. 1 means right or up, -1 means down or left
+    // In: current up/down/left/right/xdelta/ydelta, Out: up down left right
+    $n->addTestData(array(0, 0), array(0, 0, 0, 0));
+    $n->addTestData(array(1, 0), array(0, 0, 0, 1));
+    $n->addTestData(array(0, 1), array(1, 0, 0, 0));
+    $n->addTestData(array(1, 1), array(1, 0, 0, 1));
+    $n->addTestData(array(-1, 0), array(0, 0, 1, 0));
+    $n->addTestData(array(0, -1), array(0, 1, 0, 0));
+    $n->addTestData(array(-1, -1), array(0, 1, 1, 0));
+    $n->addTestData(array(1, -1), array(0, 1, 0, 1));
+    $n->addTestData(array(-1, 1), array(1, 0, 1, 0));
 
     // we try training the network for at most $max times
     $max = 10;
     $j = 0;
 
     // Train the network.
-    while (!($success = $n->train(1000, 0.001)) && ++$j < $max) {
+    while (!($success = $n->train(10000, 0.01)) && ++$j < $max) {
     }
 
-    // print a message if the network was succesfully trained
+    // Print a message.
+    $epochs = $n->getEpoch();
+    $time = microtime(True) - $time;
     if ($success) {
-        $epochs = $n->getEpoch();
-        $n->save(dirname(__FILE__) . '/../trained/maths/basic/and.nn');
+        echo "Success in {$epochs} training rounds over {$j} attempts in {$time}s.\n";
         echo "{$layer1} | {$layer2} | {$layer3}\n";
-        echo "Success in $epochs training rounds!\n";
+
+        $n->save(dirname(__FILE__) . '/../trained/game/snake/movenet.nn');
         exit(0);
+    } else {
+        echo "Failed after {$epochs} training rounds over {$time}s.\n";
     }
 }
 

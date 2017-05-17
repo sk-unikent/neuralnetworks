@@ -1,9 +1,7 @@
 <?php
 /**
- * Multi-layer Neural Network in PHP.
+ * Sigmoid perceptron.
  *
- * @author S.Kelty <S.Kelty@kent.ac.uk>
- * @version 2.0
  * @license http://opensource.org/licenses/bsd-license.php BSD License
  */
 namespace KeltyNN\Networks;
@@ -36,7 +34,7 @@ class FFMLSigPerceptron extends FFMLPerceptron
         parent::__construct($nodeCount);
 
         $this->type = 'FFMLSigPerceptron';
-        $this->version = '1.1';
+        $this->version = '1.2';
     }
 
     /**
@@ -46,8 +44,25 @@ class FFMLSigPerceptron extends FFMLPerceptron
      *
      * @return float The final output of the node
      */
-    protected function activation($value)
+    public function activation($value)
     {
         return 1.0 / (1.0 + exp(-$value));
+    }
+
+    /**
+     * Implements the derivative of the activation function. By default, this is the
+     * inverse of the 'tanh' activation function: 1.0 - tanh($value)*tanh($value);.
+     *
+     * @param float $value 'X'
+     *
+     * @return $float
+     */
+    public function derivativeActivation($value)
+    {
+        if ($this->version < 1.2) {
+            return parent::derivativeActivation($value);
+        }
+
+        return exp(-$value) / pow(exp(-$value) + 1, 2);
     }
 }

@@ -30,7 +30,7 @@ namespace KeltyNN\Networks;
 
 class FFMLPerceptron extends \KeltyNN\NeuralNetwork
 {
-    protected $nodeCount = array();
+    public $nodeCount = array();
     protected $nodeValue = array();
     public $nodeThreshold = array();
     public $edgeWeight = array();
@@ -38,6 +38,7 @@ class FFMLPerceptron extends \KeltyNN\NeuralNetwork
     protected $layerCount = 0;
     protected $previousWeightCorrection = array();
     protected $momentum = 0.8;
+    protected $bias = 0;
     protected $isVerbose = false;
     protected $weightsInitialized = false;
 
@@ -111,6 +112,16 @@ class FFMLPerceptron extends \KeltyNN\NeuralNetwork
     }
 
     /**
+     * Return an identical clone.
+     */
+    public function clone() {
+        $net = new static($this->nodeCount);
+        $data = $this->export();
+        $net->import($data);
+        return $net;
+    }
+
+    /**
      * Exports the neural network.
      *
      * @returns array
@@ -128,6 +139,7 @@ class FFMLPerceptron extends \KeltyNN\NeuralNetwork
             'nodeThreshold'      => $this->nodeThreshold,
             'learningRate'       => $this->learningRate,
             'momentum'           => $this->momentum,
+            'bias'               => $this->bias,
             'isVerbose'          => $this->isVerbose,
             'weightsInitialized' => $this->weightsInitialized,
             'trainDataID'        => $this->trainDataID,
@@ -182,6 +194,23 @@ class FFMLPerceptron extends \KeltyNN\NeuralNetwork
     }
 
     /**
+     * Set the bias of the net.
+     * Only works for version 3.0+ nets.
+     */
+    public function setBias($bias)
+    {
+        $this->bias = $bias;
+    }
+
+    /**
+     * Return the bias of the net.
+     */
+    public function getBias()
+    {
+        return $this->bias;
+    }
+
+    /**
      * Sets the 'momentum' for the learning algorithm. The momentum should
      * accelerate the learning process and help avoid local minima.
      *
@@ -200,6 +229,22 @@ class FFMLPerceptron extends \KeltyNN\NeuralNetwork
     public function getMomentum()
     {
         return $this->momentum;
+    }
+
+    /**
+     * Get all backward connections for this node.
+     */
+    protected function getPrevLayer($layer, $node) {
+        $prev_layer = $layer - 1;
+        $result = array($prev_layer => array());
+
+        for ($prev_node = 0; $prev_node < ($this->nodeCount[$prev_layer]); $prev_node++) {
+            if (isset($this->edgeWeight[$prev_layer][$prev_node][$node])) {
+                $result[$prev_layer][] = $prev_node;
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -261,11 +306,11 @@ class FFMLPerceptron extends \KeltyNN\NeuralNetwork
      *
      * @return float The final output of the node
      */
-    protected function activation($value)
+    public function activation($value)
     {
         switch ($this->version) {
             case '3.0':
-                return 1.7159 * tanh(0.666 * $value);
+                return 1.7159 * tanh(0.666 * $value + $this->bias);
             case '2.0':
                 return tanh($value) + $value; // Avoid flat spots.
             default:
@@ -281,11 +326,9 @@ class FFMLPerceptron extends \KeltyNN\NeuralNetwork
      *
      * @return $float
      */
-    protected function derivativeActivation($value)
+    public function derivativeActivation($value)
     {
-        $tanh = tanh($value);
-
-        return 1.0 - $tanh * $tanh;
+        return 1.14393 * (1 - pow(tanh(0.666 * $value), 2));
     }
 
     /**
@@ -628,7 +671,7 @@ class FFMLPerceptron extends \KeltyNN\NeuralNetwork
      *
      * @return float A random weight
      */
-    private function getRandomWeight($layer)
+    protected function getRandomWeight($layer)
     {
         return ((mt_rand(0, 1000) / 1000) - 0.5) / 2;
     }
