@@ -1,29 +1,9 @@
 <?php
 /**
- * <b>Multi-layer Neural Network in PHP</b>.
+ * Multi-layer Neural Network in PHP.
  *
- * Feed forward, multi-layer perceptron network with support for momentum learning and an advanced mechanism to prevent overfitting.
- *
- * Loosely based on source code by {@link http://www.philbrierley.com Phil Brierley},
- * that was translated into PHP by 'dspink' in sep 2005
- *
- * Algorithm was obtained from the excellent introductory book
- * "{@link http://www.amazon.com/link/dp/0321204662 Artificial Intelligence - a guide to intelligent systems}"
- * by Michael Negnevitsky (ISBN 0-201-71159-1)
- * // Add test-data to the network. In this case,
- * // we want the network to learn the 'XOR'-function
- * $n->addTestData(array (-1, -1, 1), array (-1));
- * $n->addTestData(array (-1,  1, 1), array ( 1));
- * $n->addTestData(array ( 1, -1, 1), array ( 1));
- * $n->addTestData(array ( 1,  1, 1), array (-1));
- *
- * @author E. Akerboom
- * @author {@link http://www.tremani.nl/ Tremani}, {@link http://maps.google.com/maps?f=q&hl=en&q=delft%2C+the+netherlands&ie=UTF8&t=k&om=1&ll=53.014783%2C4.921875&spn=36.882665%2C110.566406&z=4 Delft}, The Netherlands
- *
- * @since feb 2007
- *
- * @version 1.1
- *
+ * @author S.Kelty <S.Kelty@kent.ac.uk>
+ * @version 2.0
  * @license http://opensource.org/licenses/bsd-license.php BSD License
  */
 namespace KeltyNN\Networks;
